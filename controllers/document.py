@@ -7,9 +7,9 @@ document_controller = Blueprint("document_controller", __name__)
 state_store = StateStore()
 file_store = FileStore()
 
-@document_controller.route("/document/<string:documentId>", methods=["GET"])
-def get_document(document_id):
-    document = state_store.get_document(document_id)
+@document_controller.route("/document/<string:partitionkey>/<string:documentId>", methods=["GET"])
+def get_document(partitition_key, document_id):
+    document = state_store.read_document(document_id, partitition_key)
     
     if(document is None):
         return "Not found", 404
