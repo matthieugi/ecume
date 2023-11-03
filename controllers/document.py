@@ -16,6 +16,10 @@ def get_document(document_id):
 
     return document
 
+@document_controller.route("/document", methods=["GET"])
+def list_documents():
+    return state_store.list_documents()
+
 @document_controller.route("/document", methods=["POST"])
 def create_document():
 
@@ -25,7 +29,19 @@ def create_document():
     author = request.form["author"]
     file = request.files["book"]
 
-    blob = file_store.upload_file(file.name, file.stream)
-    state_store.create_document(file.name, author)
+    file_store.upload_file(file.filename, file.stream)
+    doc = state_store.create_document(file.filename, author)
 
-    return f"Document saved successfully"
+    return doc
+
+@document_controller.route("/document/<string:partition_key>/<string:document_id>", methods=["DELETE"])
+def delete_document(partition_key, document_id):
+    document = state_store.read_document(document_id, partition_key)
+
+    if(document is None):
+        return "Not found", 404
+
+    state_store.delete_document(document_id, partition_key)
+    file_store.delete_file(document["name"])
+
+    return f"Document deleted successfully"

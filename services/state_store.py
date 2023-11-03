@@ -25,20 +25,18 @@ class StateStore:
     def save_document(cls, document):
         return cls._document_container.upsert_item(document)
     
-    def delete_document(cls, document_id):
-        return cls._document_container.delete_item(document_id)
+    def delete_document(cls, document_id, partition_key):
+        return cls._document_container.delete_item(document_id, partition_key)
     
-    def get_document(cls, document_id):
-        return cls._document_container.query_items(
-            query="SELECT * FROM c WHERE c.id = @documentId",
-            parameters=[
-                dict(name="@documentId", value=document_id)
-            ]
-        )
+    def read_document(cls, document_id, partition_key):
+        return cls._document_container.read_item(document_id, partition_key)
+    
+    def list_documents(cls):
+        return cls._document_container.query_items("SELECT * FROM c", enable_cross_partition_query=True)
     
     def create_document(cls, document_name, author):
-        return cls._document_container.upsert_item({
-            "id": uuid.uuid4(),
+        return cls._document_container.create_item({
+            "id": str(uuid.uuid4()),
             "name": document_name,
             "author": author,
             "status": "pending",
