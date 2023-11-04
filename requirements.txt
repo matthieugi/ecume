@@ -3,3 +3,7 @@ python-dotenv
 azure-storage-blob 
 azure-cosmos
 azure-identity
+langchain
+openai
+pypdf
+nltk

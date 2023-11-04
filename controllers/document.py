@@ -2,6 +2,7 @@
 from flask import Blueprint, request
 from services.state_store import StateStore
 from services.file_store import FileStore
+from utils.utils import read_pdf
 
 document_controller = Blueprint("document_controller", __name__)
 state_store = StateStore()
@@ -28,9 +29,10 @@ def create_document():
 
     author = request.form["author"]
     file = request.files["book"]
+    book_text = read_pdf(file.stream)
 
     file_store.upload_file(file.filename, file.stream)
-    doc = state_store.create_document(file.filename, author)
+    doc = state_store.create_document(file.filename, author, book_text)
 
     return doc
 

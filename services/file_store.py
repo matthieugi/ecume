@@ -27,3 +27,7 @@ class FileStore:
     def delete_file(cls, file_name):
         blob_client = cls._blob_container_client.get_blob_client(file_name)
         return blob_client.delete_blob()
+    
+    def download_file(cls, file_name):
+        blob_client = cls._blob_container_client.get_blob_client(file_name)
+        return blob_client.download_blob()

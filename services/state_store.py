@@ -34,11 +34,12 @@ class StateStore:
     def list_documents(cls):
         return cls._document_container.query_items("SELECT * FROM c", enable_cross_partition_query=True)
     
-    def create_document(cls, document_name, author):
+    def create_document(cls, document_name, author, book_text):
         return cls._document_container.create_item({
             "id": str(uuid.uuid4()),
             "name": document_name,
             "author": author,
+            "book_text": book_text,
             "status": "pending",
             "summary": []
         })
