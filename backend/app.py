@@ -7,11 +7,11 @@ from controllers.summary import summary_controller
 load_dotenv()
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 
-API_SUBDOMAIN = os.getenv("API_SUBDOMAIN", "api")
+URL_PREFIX = os.getenv("URL_PREFIX", "/api")
 
 app = Flask(__name__)
-app.register_blueprint(document_controller, subdomain=API_SUBDOMAIN")
-app.register_blueprint(summary_controller, subdomain=API_SUBDOMAIN")
+app.register_blueprint(document_controller, url_prefix=URL_PREFIX)
+app.register_blueprint(summary_controller, url_prefix=URL_PREFIX)
 
 # Run the app
 if __name__ == "__main__":

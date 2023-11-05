@@ -1,12 +1,9 @@
 import React from 'react';
-import ExampleComponent from './components/ExampleComponent';
+import Dashboard from './components/Dashboard';
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <ExampleComponent />
-      "Hello World!"
-    </div>
+    <Dashboard />
   );
 }
 

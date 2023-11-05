@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Flask avec Redis",
+            "name": "Python Flask",
             "type": "python",
             "request": "launch",
             "module": "flask",
@@ -20,6 +20,13 @@
             ],
             "jinja": true,
             "justMyCode": true
+        },
+        {
+            "name": "React App",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/frontend"
         }
     ]
 }

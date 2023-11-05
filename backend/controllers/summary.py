@@ -23,6 +23,9 @@ def create_summary(partition_key, document_id):
 
     return summary
 
+async def create_summary_async(partition_key, document_id):
+    return create_summary(partition_key, document_id)
+
 @summary_controller.route("/cover/<string:partition_key>/<string:document_id>", methods=["POST"])
 def create_cover(partition_key, document_id):
 

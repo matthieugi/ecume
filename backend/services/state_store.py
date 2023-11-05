@@ -32,7 +32,7 @@ class StateStore:
         return cls._document_container.read_item(document_id, partition_key)
     
     def list_documents(cls):
-        return cls._document_container.query_items("SELECT * FROM c", enable_cross_partition_query=True)
+        return list(cls._document_container.query_items("SELECT c.id, c.name, c.author, c.status FROM c", enable_cross_partition_query=True))
     
     def create_document(cls, document_name, author, book_text):
         return cls._document_container.create_item({
