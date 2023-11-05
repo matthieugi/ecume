@@ -37,7 +37,10 @@ const AddBook = () => {
             body: formData
         })).json();
 
-        await('api/document/' + response.id)
+        fetch(`api/summary/${author}/${response.id}`,
+        {
+            method: 'POST'
+        });
         navigate('/');
     };
 

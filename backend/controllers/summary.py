@@ -19,12 +19,14 @@ def create_summary(partition_key, document_id):
     summary = cognitive_skills.summarize(document["book_text"])
 
     document["summary"] = summary
+    document["status"] = "Completed"
     state_store.save_document(document)
 
     return summary
 
 async def create_summary_async(partition_key, document_id):
-    return create_summary(partition_key, document_id)
+    await create_summary(partition_key, document_id)
+    await create_cover(partition_key, document_id)
 
 @summary_controller.route("/cover/<string:partition_key>/<string:document_id>", methods=["POST"])
 def create_cover(partition_key, document_id):

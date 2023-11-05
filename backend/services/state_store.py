@@ -40,6 +40,6 @@ class StateStore:
             "name": document_name,
             "author": author,
             "book_text": book_text,
-            "status": "pending",
+            "status": "In Progress",
             "summary": []
         })

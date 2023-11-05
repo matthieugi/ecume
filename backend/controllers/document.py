@@ -36,8 +36,6 @@ def create_document():
     file_store.upload_file(file.filename, file.stream)
     doc = state_store.create_document(name, author, book_text)
 
-    create_summary_async(doc["author"], doc["id"])
-
     return doc
 
 @document_controller.route("/document/<string:partition_key>/<string:document_id>", methods=["DELETE"])

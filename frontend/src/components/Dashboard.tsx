@@ -18,7 +18,8 @@ import Livres from './Livres';
 import AddBook from './AddBook';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Detail from './Detail';
-import { loader as DetailLoader } from './Detail';
+import { loader as detailLoader } from './Detail';
+import { loader as loaderDashboard } from './Livres';
 
 const drawerWidth: number = 240;
 
@@ -71,13 +72,16 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#008585',
+    },
+  },
+});
 
-const loaderDashboard = async () => {
-  const response = await fetch('/api/document');
-  const livres = await response.json();
-  return { livres };
-}
+
 
 const router = createBrowserRouter([{
   path: '/',
@@ -89,7 +93,7 @@ const router = createBrowserRouter([{
 },{
   path: '/detail/:author/:id',
   element: <Detail />,
-  loader: DetailLoader
+  loader: detailLoader
 }]);
 
 export default function Dashboard() {

@@ -23,7 +23,7 @@
         },
         {
             "name": "React App",
-            "type": "chrome",
+            "type": "msedge",
             "request": "launch",
             "url": "http://localhost:5173",
             "webRoot": "${workspaceFolder}/frontend"

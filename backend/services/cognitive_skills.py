@@ -58,15 +58,13 @@ class CognitiveSkills:
                     HumanMessage(content=SUMMARY_PROMPT),
                     HumanMessage(content=chunk)
                 ])
-                print(f"summary : { response.content}")
                 summary += f"{response.content} "
 
             except Exception as e:
                 print(f"error : {e}")
                 continue
             
-        
-        return ""
+        return summary
     
     def create_cover(cls, text):
         chunks = chunk_text(text, 30000)
@@ -76,7 +74,6 @@ class CognitiveSkills:
                 HumanMessage(content=COVER_PROMPT),
                 HumanMessage(content=chunks[0])
             ])
-            print(f"summary : { response.content}")
             return response.content
 
         except:

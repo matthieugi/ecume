@@ -6,6 +6,7 @@ import React, { useEffect } from "react";
 import Title from "./Title";
 import { Livre } from "../types";
 import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material";
+import { useLoaderData } from "react-router-dom";
 
 let livresdefaut = [
     {
@@ -20,12 +21,18 @@ let livresdefaut = [
     }
 ]
 
+export const loader = async () => {
+    const response = await fetch('/api/document');
+    const livres = await response.json();
+    return livres;
+  }
 
 export default function Livres() {
-    const [livres, setLivres] = React.useState(livresdefaut);
+    const livresdefaut = useLoaderData() as Livre[];
+    const [livres, setLivres] = React.useState<Livre[]>(livresdefaut);
 
     const open = (id: string) => {
-        const newLivres = livres.map(livre => {
+        const newLivres = livres.map((livre : Livre) => {
             if (livre.id == id) {
                 livre.open = !livre.open;
             }
@@ -35,20 +42,13 @@ export default function Livres() {
           setLivres(newLivres);
     }
 
-    useEffect(() => {
-        const refresh = async () => {
-            const livres: Livre[] = await (await fetch('/api/document')).json();
-            setLivres(livres);
-        }
-        refresh();
-    }, []);
-
-    const deleteBook = async (author: string, id: string) => {
+    const deleteBook = async (e:any, author: string, id: string) => {
         await fetch(`/api/document/${author}/${id}`, {
             method: 'DELETE',
         });
         const newLivres = livres.filter(livre => livre.id != id);
         setLivres(newLivres);
+        e.preventDefault();
     }
 
     return (
@@ -99,7 +99,7 @@ export default function Livres() {
                                                         <LoopIcon />
                                                     </IconButton>
                                                 }
-                                                <IconButton onClick={() => deleteBook(livre.author, livre.id)} sx={{ ml: 4 }} edge="end" aria-label="supprimer">
+                                                <IconButton onClick={(e) => deleteBook(e, livre.author, livre.id)} sx={{ ml: 4 }} edge="end" aria-label="supprimer">
                                                     <DeleteIcon />
                                                 </IconButton>
                                             </ListItemButton>
