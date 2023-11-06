@@ -3,11 +3,19 @@ from flask import Flask, send_from_directory
 from dotenv import load_dotenv
 from controllers.document import document_controller
 from controllers.summary import summary_controller
+from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry import trace
 
 load_dotenv()
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
-
 URL_PREFIX = os.getenv("URL_PREFIX", "/api")
+APPINSIGHTS_CONNECTION_STRING = os.getenv("APPINSIGHTS_CONNECTION_STRING")
+
+if(APPINSIGHTS_CONNECTION_STRING != ""):
+    configure_azure_monitor(
+        connection_string=APPINSIGHTS_CONNECTION_STRING,
+    )
+    tracer = trace.get_tracer(__name__)
 
 app = Flask(__name__, static_folder="public")
 
