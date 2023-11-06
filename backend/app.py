@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, send_from_directory
 from dotenv import load_dotenv
 from controllers.document import document_controller
 from controllers.summary import summary_controller
@@ -9,9 +9,20 @@ DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 
 URL_PREFIX = os.getenv("URL_PREFIX", "/api")
 
-app = Flask(__name__, static_folder="public", static_url_path="/")
+app = Flask(__name__, static_folder="public")
+
 app.register_blueprint(document_controller, url_prefix=URL_PREFIX)
 app.register_blueprint(summary_controller, url_prefix=URL_PREFIX)
+
+#Serve Static Files
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+
 
 # Run the app
 if __name__ == "__main__":

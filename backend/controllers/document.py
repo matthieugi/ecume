@@ -33,8 +33,8 @@ def create_document():
     file = request.files["book"]
     book_text = read_pdf(file.stream)
 
-    file_store.upload_file(file.filename, file.stream)
     doc = state_store.create_document(name, author, book_text)
+    file_store.upload_file(doc["id"], file.stream)
 
     return doc
 
@@ -46,6 +46,6 @@ def delete_document(partition_key, document_id):
         return "Not found", 404
 
     state_store.delete_document(document_id, partition_key)
-    file_store.delete_file(document["name"])
+    file_store.delete_file(document["id"])
 
     return f"Document deleted successfully"
