@@ -49,3 +49,19 @@ def delete_document(partition_key, document_id):
     file_store.delete_file(document["id"])
 
     return f"Document deleted successfully"
+
+@document_controller.route("/document/<string:partition_key>/<string:document_id>/<string:type>", methods=["DELETE"])
+def delete_document_prompt_result(partition_key, document_id, type):
+    document = state_store.read_document(document_id, partition_key)
+
+    if(document is None):
+        return "Not found", 404
+
+    elif(type == "cover"):
+        document["cover"] = ""
+    else:
+        return "Not found", 404
+
+    state_store.save_document(document)
+
+    return f"Document {type} deleted successfully"

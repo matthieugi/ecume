@@ -79,7 +79,7 @@ export default function Livres() {
                             <List>
                                 {
                                     livres.map(livre => (
-                                        <div>
+                                        <ListItem key={livre.id}>
                                             <ListItemButton
                                                 href={`/detail/${livre.author}/${livre.id}`}
                                                 disabled = {livre.status === "In Progress"}
@@ -103,7 +103,7 @@ export default function Livres() {
                                                     <DeleteIcon />
                                                 </IconButton>
                                             </ListItemButton>
-                                        </div>
+                                        </ListItem>
                                     ))
                                 }
                             </List>

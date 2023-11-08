@@ -33,11 +33,16 @@ def create_cover(partition_key, document_id):
 
     if(not partition_key or not document_id):
         return "Bad request", 400
-
+    
+    prompt = request.form['prompt']
     document = state_store.read_document(document_id, partition_key)
-    cover = cognitive_skills.create_cover(document["summary"])
+    cover = cognitive_skills.create_cover(document["summary"], prompt)
 
     document["cover"] = cover
     state_store.save_document(document)
 
     return cover
+
+@summary_controller.route("/prompt", methods=["GET"])
+def get_prompts():
+    return cognitive_skills.get_prompts()

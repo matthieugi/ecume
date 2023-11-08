@@ -1,5 +1,5 @@
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { Grid, Paper, List, ListItem, IconButton, ListItemAvatar, Avatar, ListItemText, createTheme, ThemeProvider, Toolbar, Box, Container, Button, TextField, FormControl, InputLabel, styled } from '@mui/material';
+import LoopIcon from '@mui/icons-material/Loop';
+import { Grid, Paper, List, ListItem, Toolbar, Box, Container, Button, TextField, styled } from '@mui/material';
 import React, { useState } from 'react';
 import Title from './Title';
 import { useNavigate } from 'react-router-dom';
@@ -23,10 +23,13 @@ const AddBook = () => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [file, setFile] = useState(new Blob());
+    const [sending, setSending] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
+        setSending(true);
+
         const formData = new FormData();
         formData.append('name', title);
         formData.append('author', author);
@@ -41,6 +44,7 @@ const AddBook = () => {
         {
             method: 'POST'
         });
+        
         navigate('/');
     };
 
@@ -73,13 +77,27 @@ const AddBook = () => {
                                         <TextField sx={{ flexGrow: 1 }} label="Auteur" value={author} onChange={(e) => setAuthor(e.target.value)} required />
                                     </ListItem>
                                     <ListItem>
-                                        <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
-                                            Télécharger le livre
-                                            <VisuallyHiddenInput onChange={((e) => e.target.files && setFile(e.target.files[0]))} type="file" />
+                                        <Button disabled={sending} component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+                                            {
+                                                <React.Fragment>
+                                                    Télécharger le livre
+                                                    <VisuallyHiddenInput onChange={((e) => e.target.files && setFile(e.target.files[0]))} type="file" />
+                                                </React.Fragment>
+                                            }
                                         </Button>
                                     </ListItem>
                                     <ListItem>
-                                        <Button variant="contained" type="submit">Envoyer</Button>
+                                            {
+                                                sending ?
+                                                (
+                                                    <Button disabled variant="contained" type="submit">
+                                                        <LoopIcon />
+                                                    </Button>
+                                                ) :
+                                                (
+                                                    <Button variant="contained" type="submit">Envoyer</Button>
+                                                )
+                                            }
                                     </ListItem>
                                 </List>
                             </form>

@@ -66,12 +66,12 @@ class CognitiveSkills:
             
         return summary
     
-    def create_cover(cls, text):
+    def create_cover(cls, text, prompt):
         chunks = chunk_text(text, 30000)
 
         try:
             response = cls._gpt432([
-                HumanMessage(content=COVER_PROMPT),
+                HumanMessage(content=prompt),
                 HumanMessage(content=chunks[0])
             ])
             return response.content
@@ -79,11 +79,11 @@ class CognitiveSkills:
         except:
             print(f"error")
             return "", 500
-
-            
-
         
-        
+    def get_prompts(cls):
+        return {
+            "cover": COVER_PROMPT
+        }
 
 
 
