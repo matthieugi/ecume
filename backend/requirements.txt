@@ -4,6 +4,6 @@ azure-storage-blob
 azure-cosmos
 azure-identity
 langchain
-openai
+openai==0.28.1
 pypdf
 nltk
