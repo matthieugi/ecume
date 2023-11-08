@@ -7,4 +7,3 @@ langchain
 openai
 pypdf
 nltk
-azure-monitor-opentelemetry
