@@ -43,12 +43,12 @@ export default function Livres() {
     }
 
     const deleteBook = async (e:any, author: string, id: string) => {
+        e.preventDefault();
         await fetch(`/api/document/${author}/${id}`, {
             method: 'DELETE',
         });
         const newLivres = livres.filter(livre => livre.id != id);
         setLivres(newLivres);
-        e.preventDefault();
     }
 
     return (
