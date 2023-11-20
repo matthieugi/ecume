@@ -5,9 +5,6 @@ from langchain.chat_models import AzureChatOpenAI
 from langchain.schema import HumanMessage
 from azure.identity import DefaultAzureCredential
 
-azure_credential = DefaultAzureCredential()
-openai_credential = azure_credential.get_token("https://cognitiveservices.azure.com/.default").token
-
 GPT4_DEPLOYMENT_NAME = os.getenv("GPT4_DEPLOYMENT_NAME", "gpt4")
 GPT35_DEPLOYMENT_NAME = os.getenv("GPT35_DEPLOYMENT_NAME", "gpt-35-turbo-16k")
 GPT4_32_DEPLOYMENT_NAME = os.getenv("GPT4_32_DEPLOYMENT_NAME", "gpt-4-32k")
@@ -23,6 +20,7 @@ class CognitiveSkills:
     _gpt35turbo = None
     _gpt4 = None
     _gpt432 = None
+    _azure_credential = None
     _openai_credential = None
     _openai_credential_expiration = None
 
@@ -30,10 +28,11 @@ class CognitiveSkills:
         if not isinstance(cls._instance, cls):
             cls._instance = super(CognitiveSkills, cls).__new__(cls, *args, **kwargs)
         return cls._instance
-    
+
     def get_llm_instance(cls, gpt_version):
         if cls._openai_credential_expiration is None or cls._openai_credential_expiration < datetime.now():
-            cls._openai_credential = azure_credential.get_token("https://cognitiveservices.azure.com/.default").token
+            cls._azure_credential = DefaultAzureCredential()
+            cls._openai_credential = cls._azure_credential.get_token("https://cognitiveservices.azure.com/.default").token
             cls._openai_credential_expiration = datetime.now() + timedelta(hours=8)
 
             match gpt_version:
