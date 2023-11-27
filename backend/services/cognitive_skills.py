@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime, timedelta
 from utils.utils import chunk_text
@@ -9,8 +10,24 @@ GPT4_DEPLOYMENT_NAME = os.getenv("GPT4_DEPLOYMENT_NAME", "gpt4")
 GPT35_DEPLOYMENT_NAME = os.getenv("GPT35_DEPLOYMENT_NAME", "gpt-35-turbo-16k")
 GPT4_32_DEPLOYMENT_NAME = os.getenv("GPT4_32_DEPLOYMENT_NAME", "gpt-4-32k")
 AZURE_OPENAI_API_BASE = os.getenv("AZURE_OPENAI_API_BASE")
+
 SUMMARY_PROMPT = os.getenv("SUMMARY_PROMPT", "Summarize the following text:")
-COVER_PROMPT = os.getenv("COVER_PROMPT", "Create a cover for the following text:")
+COVER_PROMPT = os.getenv("COVER_PROMPT", "INSTRUCTION : Crée une quatrième de couverture à partir du résumé du livre qu'il t'es donné. Tu dois présenter la trame principale de l'intrigue, sans dévoiler la fin ou la résolution. Tu dois également présenter les personnages principaux et les lieux principaux. Tu dois également donner envie au lecteur de lire le livre, sans interpeller le lecteur. Tu utiliseras le personna du lecteur qu'il t'es donné pour adapter ton résultat en fonction de ses centres d'intérêts, sans dire au lecteur que tu connais son personna. Tu peux par exemple cloturer en posant une question ou en donnant un apercu des premières aventures du personnage principal. le résultat ne dois pas dépasser 200 mots. Tu dois adapter ton style au personna qu'il t'es décrit, tout en restant toujours poli. Tu donneras uniquement la quatrième de couverture sans introduction, analyse ou commentaire.")
+
+PIA_PROMPT = os.getenv("PIA_PROMPT", "PERSONA : Pia lit beaucoup de genres et de styles différents, des classiques à la fiction contemporaine, de la poésie aux essais. Elle aime découvrir de nouveaux auteurs et de nouvelles tendances, mais aussi revisiter ses anciens favoris. Elle est toujours curieuse et ouverte d'esprit en ce qui concerne les livres.")
+FRANCOIS_PROMPT = os.getenv("FRANCOIS_PROMPT", "PERSONA : François lit principalement des romans littéraires, en particulier des auteurs français et européens. Il apprécie la prose bien écrite, les personnages complexes et les thèmes riches. Il n'est pas très intéressé par les romans de genre ou les best-sellers populaires. Il aime discuter de livres avec ses amis et sa famille.")
+JEAN_PROMPT = os.getenv("JEAN_PROMPT", "PERSONA : Jean lit surtout des romans de science-fiction, en particulier ceux qui sont rapides, pleins d'action et imaginatifs. Il aime être surpris et diverti par les histoires et les personnages. Il n'aime pas beaucoup les romans littéraires ou les ouvrages documentaires. Il lit rarement les critiques ou les avis sur les livres avant de les acheter, mais aujourd'hui, il a du mal à trouver de nouvelles lectures.")
+OLYMPE_PROMPT = os.getenv("OLYMPE_PROMPT", "PERSONA : Olympe lit principalement des livres d'art et d'histoire, en particulier ceux qui sont bien documentés, informatifs et illustrés. Elle aime apprendre de nouvelles choses et approfondir ses connaissances sur divers sujets. Elle n'est pas très intéressée par les livres de fiction ou les livres contemporains. Elle préfère acheter des livres auprès de sources réputées et d'experts.")
+PERSONNAS_PROMPTS = {
+    "Pia": PIA_PROMPT,
+    "François": FRANCOIS_PROMPT,
+    "Jean": JEAN_PROMPT,
+    "Olympe": OLYMPE_PROMPT
+}
+
+
+THEME_PROMPT_LIST = ['Littérature', ' Philosophie', ' Sciences', ' Histoire', ' Politique', ' Economie', ' Art', ' Religion', ' Société', ' Psychologie', ' Biographie', ' Crime', ' Fantaisie', ' Science-fiction', ' Horreur', ' Romance', ' Jeunesse', ' Technologie', ' Drame', ' Tourisme', ' Sport', ' Cuisine', ' Voyage', ' Environnement', ' Education', ' Santé', ' Humour', ' Musique', ' Cinéma', ' Télévision', ' Médias', ' Mode', ' Vie quotidienne', ' Famille', ' Amour', ' Amitié', ' Sexualité', ' Animaux', ' Nature', ' Aventure', ' Jeux', ' Science', ' Mathématiques', ' Physique', ' Chimie', ' Biologie', ' Géologie', ' Astronomie', ' Médecine', ' Psychiatrie', ' Sociologie', ' Géographie', ' Droit', ' Littérature', ' Langues']
+THEME_PROMPT = os.getenv("THEME_PROMPT", f"""Tu dois classer l'extrait de livre parmis les catégories qui te sont proposées. Le résultat sera donné sous forme d'un tableau ["catégorie1", "catégorie2"...] avec les catégories dont la probabilité est supérieur à 0.7. Les catégories sont les suivantes : {', '.join(THEME_PROMPT_LIST)}. L'extrait est le suivant : """)
 
 OPENAI_API_TYPE = "azure_ad"
 OPENAI_API_VERSION = "2023-05-15"
@@ -107,11 +124,65 @@ class CognitiveSkills:
         except Exception as e:
             print(f"error: {e}")
             return f"error : {e}", 500
+                
         
     def get_prompts(cls):
-        return {
-            "cover": COVER_PROMPT
-        }
+        return PERSONNAS_PROMPTS
+    
+    def create_themes(cls, text):
+        chunks = chunk_text(text, 25000)
+        llm_instance = cls.get_llm_instance("gpt-4-32k")
+
+        try:
+            retry = 3
+            while(retry > 0):
+                response = llm_instance([
+                    HumanMessage(content=THEME_PROMPT),
+                    HumanMessage(content=chunks[0])
+                ])
+
+                print(f"Detected themes : {response.content}")
+                
+                try:
+                    themes = json.loads(response.content.strip())
+                    return themes
+                except Exception as e:
+                    print(f"error: {e}")
+                    retry -= 1
+                    continue
+            
+            return []
+        
+        except Exception as e:
+            print(f"error: {e}")
+            return f"error : {e}", 500
+
+    def create_covers(cls, text):
+        res = []
+
+        chunks = chunk_text(text, 28000)
+        llm_instance = cls.get_llm_instance("gpt-4-32k")
+
+
+        # pour tous les prompts de PERSONNAS_PROMPTS, on fait un create_cover avec comme key le nom du personna et comme value le prompt
+        for persona, prompt in PERSONNAS_PROMPTS.items():
+            try:
+                response = llm_instance([
+                    HumanMessage(content=COVER_PROMPT),
+                    HumanMessage(content=prompt),
+                    HumanMessage(content=f'LIVRE: {chunks[0]}')
+                ])
+                res.append({
+                    "persona_name": persona,
+                    "content": response.content,
+                })
+                print(f"Cover for {persona} : {response.content}")
+
+            except Exception as e:
+                print(f"error: {e}")
+                return f"error : {e}", 500
+
+        return res
 
 
 

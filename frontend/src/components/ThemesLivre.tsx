@@ -1,14 +1,17 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/material';
+import { styled } from '@mui/material';
 
-const useStyles = makeStyles({
-  theme: {
-    border: '1px solid #000',
-  },
-});
 
-const classes = useStyles();
+const ThemeKeyword = styled(Typography)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  borderColor: theme.palette.primary.main,
+  borderStyle: 'solid',
+  borderWidth: '1px',
+  borderRadius: '4px',
+  padding: theme.spacing(1),
+  margin: theme.spacing(0.5),
+}));
 
 interface ThemesLivreProps {
   themes : string[],
@@ -20,9 +23,9 @@ export default function ThemesLivre(props: ThemesLivreProps) {
 
   return (
     themes.map(theme => (
-        <Typography  component="h2" variant="h6" color="primary" gutterBottom>
+        <ThemeKeyword color="primary" gutterBottom>
           {theme}
-        </Typography>
+        </ThemeKeyword>
       )
     )
   );

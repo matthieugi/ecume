@@ -9,7 +9,7 @@ export type Livre = {
     themes: string[],
     cover: string;
     covers: {
-        persona: string,
+        persona_name: string,
         persona_picture: string,
         content: string
     }[];
