@@ -13,9 +13,9 @@ import Badge from '@mui/material/Badge';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems } from './listItems';
+import { mainListItems } from '../components/listItems';
 import Livres from './Livres';
-import AddBook from './AddBook';
+import PageLivre from './Livre';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Detail from './Detail';
 import { loader as detailLoader } from './Detail';
@@ -79,6 +79,12 @@ const defaultTheme = createTheme({
       main: '#008585',
     },
   },
+  typography: {
+    fontSize: 14,
+    h1: {
+      fontSize: 12
+    }
+  }
 });
 
 
@@ -89,7 +95,7 @@ const router = createBrowserRouter([{
   loader: loaderDashboard
 }, {
   path: '/add',
-  element: <AddBook />
+  element: <PageLivre />
 },{
   path: '/detail/:author/:id',
   element: <Detail />,
@@ -126,7 +132,7 @@ export default function Dashboard() {
             </IconButton>
             <Typography
               component="h1"
-              variant="h6"
+              variant='h6'
               color="inherit"
               noWrap
               sx={{ flexGrow: 1 }}

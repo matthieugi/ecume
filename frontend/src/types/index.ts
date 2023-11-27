@@ -6,6 +6,12 @@ export type Livre = {
     status: string;
     summary: string;
     book_text: string;
+    themes: string[],
     cover: string;
-    open: boolean
+    covers: {
+        persona: string,
+        persona_picture: string,
+        content: string
+    }[];
+    open: boolean;
 }

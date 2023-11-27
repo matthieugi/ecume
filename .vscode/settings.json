@@ -1,5 +1,11 @@
 {
     "files.exclude": {
         "**/__pycache__": true
-    }
+    },
+    "terminal.integrated.env.linux": {
+        "PATH": "/home/matt/.azurelogicapps/dependencies/DotNetSDK:${env:PATH}"
+    },
+    "omnisharp.dotNetCliPaths": [
+        "/home/matt/.azurelogicapps/dependencies/DotNetSDK"
+    ]
 }

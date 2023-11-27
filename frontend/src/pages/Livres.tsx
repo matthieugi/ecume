@@ -3,7 +3,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LoopIcon from '@mui/icons-material/Loop';
 import React, { useEffect } from "react";
-import Title from "./Title";
+import Title from "../components/Title";
 import { Livre } from "../types";
 import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material";
 import { useLoaderData } from "react-router-dom";
@@ -65,7 +65,7 @@ export default function Livres() {
             }}
         >
             <Toolbar />
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Container maxWidth={false} sx={{ mt: 4, mb: 4 }}>
                 <Grid container spacing={3}>
                     <Grid item xs={1} >
                         <Button href="/add" variant="contained">

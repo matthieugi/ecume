@@ -1,7 +1,7 @@
 import LoopIcon from '@mui/icons-material/Loop';
 import { Grid, Paper, List, ListItem, Toolbar, Box, Container, Button, TextField, styled } from '@mui/material';
 import React, { useState } from 'react';
-import Title from './Title';
+import Title from '../components/Title';
 import { useNavigate } from 'react-router-dom';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Livre } from '../types';
@@ -19,7 +19,7 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
   });
 
-const AddBook = () => {
+const PageLivre = () => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [file, setFile] = useState(new Blob());
@@ -62,7 +62,7 @@ const AddBook = () => {
             }}
         >
             <Toolbar />
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Container maxWidth={false}  sx={{ mt: 4, mb: 4 }}>
                 <Grid container spacing={3}>
                     {/* Books */}
                     <Grid item xs={12}>
@@ -109,4 +109,4 @@ const AddBook = () => {
     );
 }
 
-export default AddBook;
+export default PageLivre;
