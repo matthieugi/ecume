@@ -3,7 +3,7 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
 ACCOUNT_NAME = os.getenv("STORAGE_ACCOUNT_NAME")
-ACCOUNT_URL = f"""https://{ACCOUNT_NAME}.blob.core.windows.net"""
+ACCOUNT_URL = f"https://{ACCOUNT_NAME}.blob.core.windows.net"
 CONTAINER_NAME = "books"
 
 
