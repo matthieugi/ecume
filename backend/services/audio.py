@@ -12,8 +12,6 @@ langs = ['celeste vielle', 'Yvette Pia', '' ]
 speech_config = speechsdk.SpeechConfig(subscription=SPEECH_KEY, region=SPEECH_REGION)
 speech_config.speech_synthesis_voice_name=SPEECH_VOICE
 
-# The language of the voice that speaks.
-
 
 def create_audio(filename, text):
     file_path = f"{filename}.wav"

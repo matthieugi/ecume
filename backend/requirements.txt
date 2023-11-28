@@ -7,3 +7,4 @@ langchain
 openai==0.28.1
 pypdf
 nltk
+azure-cognitiveservices-speech

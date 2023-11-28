@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timedelta
 from utils.utils import chunk_text
 from langchain.chat_models import AzureChatOpenAI
-from langchain.schema import HumanMessage
+from langchain.schema import HumanMessage, SystemMessage
 from azure.identity import DefaultAzureCredential
 
 GPT4_DEPLOYMENT_NAME = os.getenv("GPT4_DEPLOYMENT_NAME", "gpt4")
@@ -12,13 +12,14 @@ GPT4_32_DEPLOYMENT_NAME = os.getenv("GPT4_32_DEPLOYMENT_NAME", "gpt-4-32k")
 AZURE_OPENAI_API_BASE = os.getenv("AZURE_OPENAI_API_BASE")
 
 SUMMARY_PROMPT = os.getenv("SUMMARY_PROMPT", "Summarize the following text:")
-COVER_PROMPT = os.getenv("COVER_PROMPT", "INSTRUCTION : Crée une quatrième de couverture à partir du résumé du livre qu'il t'es donné. Tu dois présenter la trame principale de l'intrigue, sans dévoiler la fin ou la résolution. Tu dois également présenter les personnages principaux et les lieux principaux. Tu dois également donner envie au lecteur de lire le livre, sans interpeller le lecteur. Tu utiliseras le personna du lecteur qu'il t'es donné pour adapter ton résultat en fonction de ses centres d'intérêts, sans dire au lecteur que tu connais son personna. Tu peux par exemple cloturer en posant une question ou en donnant un apercu des premières aventures du personnage principal. le résultat ne dois pas dépasser 200 mots. Tu dois adapter ton style au personna qu'il t'es décrit, tout en restant toujours poli. Tu donneras uniquement la quatrième de couverture sans introduction, analyse ou commentaire.")
+#COVER_PROMPT = os.getenv("COVER_PROMPT", "INSTRUCTION : Crée une quatrième de couverture à partir du résumé du livre qu'il t'es donné. Tu dois présenter la trame principale de l'intrigue, sans dévoiler la fin ou la résolution. Tu dois également présenter les personnages principaux et les lieux principaux. Tu dois également donner envie au lecteur de lire le livre, sans interpeller le lecteur. Tu utiliseras le persona du lecteur qu'il t'es donné pour adapter ton résultat en fonction de ses centres d'intérêts, sans dire au lecteur que tu connais son persona. Tu peux par exemple cloturer en posant une question ou en donnant un apercu des premières aventures du personnage principal. le résultat ne dois pas dépasser 200 mots. Tu dois adapter ton style au persona qu'il t'es décrit. Tu donneras uniquement la quatrième de couverture sans introduction, analyse ou commentaire.")
+COVER_PROMPT = os.getenv("COVER_PROMPT", "INSTRUCTION : Crée une quatrième de couverture à partir du résumé du livre qu'il t'es donné. Tu dois présenter la trame principale de l'intrigue, sans dévoiler la fin ou la résolution. Tu dois donner envie au lecteur de lire le livre, sans interpeller le lecteur. Tu peux par exemple cloturer en posant une question ou en donnant un apercu des premières aventures du personnage principal. le résultat ne dois pas dépasser 200 mots. Tu dois adapter ton style au PERSONA qui t'es décrit. Tu donneras uniquement la quatrième de couverture sans introduction, analyse ou commentaire.")
 
 PIA_PROMPT = os.getenv("PIA_PROMPT", "PERSONA : Pia lit beaucoup de genres et de styles différents, des classiques à la fiction contemporaine, de la poésie aux essais. Elle aime découvrir de nouveaux auteurs et de nouvelles tendances, mais aussi revisiter ses anciens favoris. Elle est toujours curieuse et ouverte d'esprit en ce qui concerne les livres.")
 FRANCOIS_PROMPT = os.getenv("FRANCOIS_PROMPT", "PERSONA : François lit principalement des romans littéraires, en particulier des auteurs français et européens. Il apprécie la prose bien écrite, les personnages complexes et les thèmes riches. Il n'est pas très intéressé par les romans de genre ou les best-sellers populaires. Il aime discuter de livres avec ses amis et sa famille.")
-JEAN_PROMPT = os.getenv("JEAN_PROMPT", "PERSONA : Jean lit surtout des romans de science-fiction, en particulier ceux qui sont rapides, pleins d'action et imaginatifs. Il aime être surpris et diverti par les histoires et les personnages. Il n'aime pas beaucoup les romans littéraires ou les ouvrages documentaires. Il lit rarement les critiques ou les avis sur les livres avant de les acheter, mais aujourd'hui, il a du mal à trouver de nouvelles lectures.")
+JEAN_PROMPT = os.getenv("JEAN_PROMPT", "PERSONA : Jean aime les résumés qui sont écrits avec un langage urbain et familier.")
 OLYMPE_PROMPT = os.getenv("OLYMPE_PROMPT", "PERSONA : Olympe lit principalement des livres d'art et d'histoire, en particulier ceux qui sont bien documentés, informatifs et illustrés. Elle aime apprendre de nouvelles choses et approfondir ses connaissances sur divers sujets. Elle n'est pas très intéressée par les livres de fiction ou les livres contemporains. Elle préfère acheter des livres auprès de sources réputées et d'experts.")
-PERSONNAS_PROMPTS = {
+PERSONAS_PROMPTS = {
     "Pia": PIA_PROMPT,
     "François": FRANCOIS_PROMPT,
     "Jean": JEAN_PROMPT,
@@ -127,7 +128,7 @@ class CognitiveSkills:
                 
         
     def get_prompts(cls):
-        return PERSONNAS_PROMPTS
+        return PERSONAS_PROMPTS
     
     def create_themes(cls, text):
         chunks = chunk_text(text, 25000)
@@ -165,11 +166,10 @@ class CognitiveSkills:
 
 
         # pour tous les prompts de PERSONNAS_PROMPTS, on fait un create_cover avec comme key le nom du personna et comme value le prompt
-        for persona, prompt in PERSONNAS_PROMPTS.items():
+        for persona, prompt in PERSONAS_PROMPTS.items():
             try:
                 response = llm_instance([
-                    HumanMessage(content=COVER_PROMPT),
-                    HumanMessage(content=prompt),
+                    SystemMessage(content=f"{COVER_PROMPT} {prompt}"),
                     HumanMessage(content=f'LIVRE: {chunks[0]}')
                 ])
                 res.append({

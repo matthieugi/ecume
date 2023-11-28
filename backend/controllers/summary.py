@@ -19,8 +19,18 @@ def create_summary(partition_key, document_id):
 
     document = state_store.read_document(document_id, partition_key)
     summary = cognitive_skills.summarize(document["book_text"])
+    # summary = document["summary"]
 
     document["summary"] = summary
+    document["themes"] = cognitive_skills.create_themes(summary)
+    document["covers"] = cognitive_skills.create_covers(summary)   
+
+    for cover in document["covers"]:
+        audio = create_audio(f"{document_id}-{cover['persona_name']}", cover['content'])
+        stream = open(f"{document_id}-{cover['persona_name']}.wav", "rb")
+        file_store.upload_file(f"{document_id}-{cover['persona_name']}.wav", stream)
+        os.remove(f"{document_id}-{cover['persona_name']}.wav")
+
     document["status"] = "Completed"
     state_store.save_document(document)
 
@@ -74,7 +84,6 @@ def create_covers(partition_key, document_id):
         file_store.upload_file(f"{document_id}-{cover['persona_name']}.wav", stream)
         os.remove(f"{document_id}-{cover['persona_name']}.wav")
 
-
     document["covers"] = covers
     state_store.save_document(document)
 
@@ -83,7 +92,7 @@ def create_covers(partition_key, document_id):
 @summary_controller.route("/audio/<string:partition_key>/<string:document_id>/<string:persona>", methods=["GET"])
 def get_audio_file(partition_key, document_id, persona):
     sas_url = file_store.generate_sas(f"{document_id}-{persona}.wav")
-    return sas_url
+    return { 'url': sas_url }
 
 @summary_controller.route("/prompt", methods=["GET"])
 def get_prompts():

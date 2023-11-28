@@ -102,8 +102,17 @@ const Detail = () => {
         navigate(`/detail/${author}/${id}`)
     }
 
-    const playText = async (text: string) => {
-        console.log(text);
+    const playText = async (author:string, id: string, persona_name: string) => {
+        const speech_controller = document.getElementById('speech_controller') as HTMLAudioElement;
+        
+        if(speech_controller.paused) {
+            const { url } = await (await fetch(`/api/audio/${author}/${id}/${persona_name}`)).json();
+            speech_controller.src = url;
+            speech_controller.play();
+        }
+        else {
+            speech_controller.pause();
+        }
     }
 
     const coversLayout = (props: any) => {
@@ -128,7 +137,7 @@ const Detail = () => {
                                                     {cover.persona_description}
                                                 </Typography>
                                             </div>
-                                            <Button variant='outlined' onClick={() => playText(cover.content)} >
+                                            <Button variant='outlined' onClick={() => playText(author, id, cover.persona_name)} >
                                                 <PlayArrowIcon />
                                             </Button>
                                         </Stack>
@@ -218,6 +227,7 @@ const Detail = () => {
 
                     <Typography variant='h6' color='primary' gutterBottom>Couvertures</Typography>
                     <Paper sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+                        <audio id="speech_controller" style={{ display: 'none'}} />
                         {coversLayout({ data: cover, id: id, author: author, type: 'cover', covers: covers, prompt: prompts.cover })}
                     </Paper>
                 </Stack>
