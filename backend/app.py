@@ -1,8 +1,10 @@
 import os
 from flask import Flask, send_from_directory
 from dotenv import load_dotenv
+import threading
 from controllers.document import document_controller
 from controllers.summary import summary_controller
+from controllers.summary_backend import read_messages
 
 load_dotenv()
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
@@ -24,8 +26,15 @@ def serve(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 
+def app_backend_thread():
+    thread = threading.Thread(target=read_messages)
+    thread.start()
+
+app_backend_thread()
+
 # Run the app
 if __name__ == "__main__":
+    print("Starting Flask app")
     if(DEBUG):
         app.run(debug=True)
     else:

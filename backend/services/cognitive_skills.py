@@ -49,47 +49,42 @@ class CognitiveSkills:
 
     def get_llm_instance(cls, gpt_version):
         if cls._openai_credential_expiration is None or cls._openai_credential_expiration < datetime.now():
-            cls._azure_credential = DefaultAzureCredential()
-            cls._openai_credential = cls._azure_credential.get_token("https://cognitiveservices.azure.com/.default").token
             cls._openai_credential_expiration = datetime.now() + timedelta(hours=8)
-
-            match gpt_version:
-                case "gpt-35-turbo-16k":
-                    cls._gpt35turbo = AzureChatOpenAI(
-                        openai_api_base=AZURE_OPENAI_API_BASE,
-                        openai_api_key=cls._openai_credential,
-                        openai_api_type=OPENAI_API_TYPE,
-                        openai_api_version=OPENAI_API_VERSION,
-                        deployment_name=GPT35_DEPLOYMENT_NAME,
-                    )
-                case "gpt4":
-                    cls._gpt4 = AzureChatOpenAI(
-                        openai_api_base=AZURE_OPENAI_API_BASE,
-                        openai_api_key=cls._openai_credential,
-                        openai_api_type=OPENAI_API_TYPE,
-                        openai_api_version=OPENAI_API_VERSION,
-                        deployment_name=GPT4_DEPLOYMENT_NAME,
-                    )
-                case "gpt-4-32k":
-                    cls._gpt432 = AzureChatOpenAI(
-                        openai_api_base=AZURE_OPENAI_API_BASE,
-                        openai_api_key=cls._openai_credential,
-                        openai_api_type=OPENAI_API_TYPE,
-                        openai_api_version=OPENAI_API_VERSION,
-                        deployment_name=GPT4_32_DEPLOYMENT_NAME,
-                    )
+        
+        cls._azure_credential = DefaultAzureCredential()
+        cls._openai_credential = cls._azure_credential.get_token("https://cognitiveservices.azure.com/.default").token
         
         match gpt_version:
             case "gpt-35-turbo-16k":
+                cls._gpt35turbo = AzureChatOpenAI(
+                    openai_api_base=AZURE_OPENAI_API_BASE,
+                    openai_api_key=cls._openai_credential,
+                    openai_api_type=OPENAI_API_TYPE,
+                    openai_api_version=OPENAI_API_VERSION,
+                    deployment_name=GPT35_DEPLOYMENT_NAME,
+                )
                 return cls._gpt35turbo
             case "gpt4":
+                cls._gpt4 = AzureChatOpenAI(
+                    openai_api_base=AZURE_OPENAI_API_BASE,
+                    openai_api_key=cls._openai_credential,
+                    openai_api_type=OPENAI_API_TYPE,
+                    openai_api_version=OPENAI_API_VERSION,
+                    deployment_name=GPT4_DEPLOYMENT_NAME,
+                )
                 return cls._gpt4
             case "gpt-4-32k":
+                cls._gpt432 = AzureChatOpenAI(
+                    openai_api_base=AZURE_OPENAI_API_BASE,
+                    openai_api_key=cls._openai_credential,
+                    openai_api_type=OPENAI_API_TYPE,
+                    openai_api_version=OPENAI_API_VERSION,
+                    deployment_name=GPT4_32_DEPLOYMENT_NAME,
+                )
                 return cls._gpt432
+        return cls._gpt35turbo
             
         
-
-    
     def summarize(cls, text):
         chunks = chunk_text(text, 3000)
         summary = ""
