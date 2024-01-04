@@ -4,6 +4,7 @@ azure-storage-blob
 azure-cosmos
 azure-identity
 langchain
-openai==0.28.1
+openai
 pypdf
 nltk
+tiktoken
